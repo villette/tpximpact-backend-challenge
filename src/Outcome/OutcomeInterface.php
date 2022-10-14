@@ -2,8 +2,6 @@
 
 namespace Root\BackendChallenge\Outcome;
 
-use Root\BackendChallenge\Events\EventInterface;
-
 /**
  * Defines the different outcomes of the rooms.
  */
@@ -26,11 +24,11 @@ interface OutcomeInterface {
   public function result(): string;
 
   /**
-   * Gets the consequence of the outcome in form of event.
+   * Gets the consequences of the outcome in form of events.
    *
-   * @return \Root\BackendChallenge\Events\EventInterface|null
-   *   The event that will trigger as a consequence of this outcome.
+   * @return \Root\BackendChallenge\Events\EventInterface[]
+   *   The events that will trigger as consequences of this outcome.
    */
-  public function consequence(): EventInterface|null;
+  public function consequences(): array;
 
 }

@@ -2,8 +2,6 @@
 
 namespace Root\BackendChallenge\Outcome;
 
-use Root\BackendChallenge\Events\EventInterface;
-
 /**
  * A class describing a choice outcome.
  */
@@ -24,11 +22,11 @@ class Outcome implements OutcomeInterface {
   protected $result;
 
   /**
-   * The consequence of the outcome.
+   * The consequences of the outcome.
    *
-   * @var \Root\BackendChallenge\Events\EventInterface
+   * @var \Root\BackendChallenge\Events\EventInterface[]
    */
-  protected $consequence;
+  protected $consequences;
 
   /**
    * Creates a new Outcome object.
@@ -37,13 +35,13 @@ class Outcome implements OutcomeInterface {
    *   The choice of the outcome.
    * @param string $result
    *   The result of the outcome.
-   * @param \Root\BackendChallenge\Events\EventInterface $consequence
-   *   The consequence of the outcome.
+   * @param \Root\BackendChallenge\Events\EventInterface[] $consequences
+   *   The consequences of the outcome.
    */
-  public function __construct(string $choice, string $result, EventInterface $consequence = NULL) {
+  public function __construct(string $choice, string $result, array $consequences) {
     $this->choice = $choice;
     $this->result = $result;
-    $this->consequence = $consequence;
+    $this->consequences = $consequences;
   }
 
   /**
@@ -63,8 +61,8 @@ class Outcome implements OutcomeInterface {
   /**
    * {@inheritdoc}
    */
-  public function consequence(): EventInterface|null {
-    return $this->consequence;
+  public function consequences(): array {
+    return $this->consequences;
   }
 
 }

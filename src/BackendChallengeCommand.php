@@ -3,10 +3,10 @@
 namespace Root\BackendChallenge;
 
 use Root\BackendChallenge\Character\Character;
-use Root\BackendChallenge\Events\CharacterDies;
-use Root\BackendChallenge\Events\CharacterExitSuccess;
-use Root\BackendChallenge\Events\CharacterGainHealthPoint;
-use Root\BackendChallenge\Events\CharacterLoseHealthPoint;
+use Root\BackendChallenge\Event\CharacterDies;
+use Root\BackendChallenge\Event\CharacterExitSuccess;
+use Root\BackendChallenge\Event\CharacterGainHealthPoint;
+use Root\BackendChallenge\Event\CharacterLoseHealthPoint;
 use Root\BackendChallenge\Exceptions\BackendChallengeException;
 use Root\BackendChallenge\Outcome\Outcome;
 use Root\BackendChallenge\Outcome\OutcomeInterface;
@@ -15,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 
 /**
  * Main symfony command of the Backend Challenge game.
@@ -49,7 +50,18 @@ class BackendChallengeCommand extends Command {
    * {@inheritdoc}
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
-    $helper = $this->getHelper('question');
+    /** @var \Symfony\Component\Console\Helper\QuestionHelper $questionHelper */
+    $questionHelper = $this->getHelper('question');
+
+    // Ask the player for the character name.
+    $question = new Question("What is your name?\n", 'Maximilian');
+
+    // Get name answer from player and assign it to character.
+    $name = $questionHelper->ask($input, $output, $question);
+    $this->character->setName($name);
+
+    $output->writeln(sprintf('Your name is %s', $name));
+    $output->writeln('');
 
     try {
       // For each room the player goes through, do the following.
@@ -72,7 +84,7 @@ class BackendChallengeCommand extends Command {
         );
 
         // Prompt the player with the question and get the answer from stdin.
-        $answer = $helper->ask($input, $output, $question);
+        $answer = $questionHelper->ask($input, $output, $question);
 
         // Display the result of the chosen outcome.
         $chosenOutcome = $outcomes[$answer];
@@ -87,11 +99,15 @@ class BackendChallengeCommand extends Command {
       }
     }
     catch (BackendChallengeException $e) {
+      // In case of a win or a loss, there is a BackendChallengeException thrown
+      // with the relevant message, we just need to catch it and display it.
       $output->writeln($e->getMessage());
 
       return $e->getCode();
     }
 
+    // The game should never reach this point, but we still need to return
+    // something in this unlikely event.
     return Command::SUCCESS;
   }
 
@@ -106,8 +122,16 @@ class BackendChallengeCommand extends Command {
   /**
    * Prepares the rooms that the character will go through during the game.
    *
+   * This method statically prepares a list of rooms with their flavour texts,
+   * questions, answers and outcomes. This list will then be used by the
+   * execute() method to make the character go through them.
+   *
    * @return \Root\BackendChallenge\Room\RoomInterface[]
    *   An array of rooms.
+   *
+   * @see \Root\BackendChallenge\Room\RoomInterface
+   * @see \Root\BackendChallenge\Outcome\OutcomeInterface
+   * @see \Root\BackendChallenge\Event\EventInterface
    */
   private function prepareRooms(): array {
     return [

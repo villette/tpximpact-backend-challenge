@@ -24,7 +24,7 @@ class Outcome implements OutcomeInterface {
   /**
    * The consequences of the outcome.
    *
-   * @var \Root\BackendChallenge\Events\EventInterface[]
+   * @var \Root\BackendChallenge\Event\EventInterface[]
    */
   protected $consequences;
 
@@ -35,7 +35,7 @@ class Outcome implements OutcomeInterface {
    *   The choice of the outcome.
    * @param string $result
    *   The result of the outcome.
-   * @param \Root\BackendChallenge\Events\EventInterface[] $consequences
+   * @param \Root\BackendChallenge\Event\EventInterface[] $consequences
    *   The consequences of the outcome.
    */
   public function __construct(string $choice, string $result, array $consequences) {

@@ -26,7 +26,7 @@ interface OutcomeInterface {
   /**
    * Gets the consequences of the outcome in form of events.
    *
-   * @return \Root\BackendChallenge\Events\EventInterface[]
+   * @return \Root\BackendChallenge\Event\EventInterface[]
    *   The events that will trigger as consequences of this outcome.
    */
   public function consequences(): array;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Root\BackendChallenge\Events;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Character\CharacterInterface;
 use Root\BackendChallenge\Exceptions\GameOverException;

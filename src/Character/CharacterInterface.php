@@ -18,6 +18,25 @@ interface CharacterInterface {
   const MINIMUM_HEALTH_POINTS = 0;
 
   /**
+   * Sets the name of the character
+   *
+   * @param string $name
+   *   The name to assign the character.
+   *
+   * @return static
+   *   The current character object.
+   */
+  public function setName(string $name): static;
+
+  /**
+   * Gets the name of the character.
+   *
+   * @return string
+   *   The name of the character.
+   */
+  public function getName(): string;
+
+  /**
    * Sets hearts to a character.
    *
    * @param int $healthPoints

@@ -8,6 +8,13 @@ namespace Root\BackendChallenge\Character;
 class Character implements CharacterInterface {
 
   /**
+   * The name of the character.
+   *
+   * @var string
+   */
+  protected $name;
+
+  /**
    * The number of hearts the character has.
    *
    * @var int
@@ -19,6 +26,22 @@ class Character implements CharacterInterface {
    */
   public function __construct() {
     $this->healthPoints = self::STARTING_HEALTH_POINTS;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setName(string $name): static {
+    $this->name = $name;
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getName(): string {
+    return $this->name;
   }
 
   /**

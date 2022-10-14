@@ -1,6 +1,6 @@
 <?php
 
-namespace Root\BackendChallenge\Events;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Character\CharacterInterface;
 use Root\BackendChallenge\Exceptions\GameWonException;
@@ -34,7 +34,14 @@ class CharacterExitSuccess implements EventInterface {
    * @throws \Root\BackendChallenge\Exception\GameWonException
    */
   public function resolveEvent(): void {
-    $message = sprintf('You successfully exited the dungeon with %d hearts, congratulations!', $this->character->getHealthPoints());
+    $name = $this->character->getName();
+    $hearts = $this->character->getHealthPoints();
+
+    $message = sprintf(
+      'Congratulation %s! You successfully exited the dungeon with %s.',
+      $name,
+      $hearts == 1 ? sprintf('1 heart') : sprintf('%d hearts', $hearts),
+    );
 
     throw new GameWonException($message, Command::SUCCESS);
   }

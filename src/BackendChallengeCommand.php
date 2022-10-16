@@ -10,6 +10,7 @@ use Root\BackendChallenge\Event\CharacterEvent\CharacterLoseHealthPoint;
 use Root\BackendChallenge\Event\CharacterEvent\CharacterMoveForward;
 use Root\BackendChallenge\Event\GameEvent\GameExit;
 use Root\BackendChallenge\Event\GameEvent\GameSave;
+use Root\BackendChallenge\Event\GameEvent\GameStatus;
 use Root\BackendChallenge\Exceptions\BackendChallengeException;
 use Root\BackendChallenge\Outcome\Outcome;
 use Root\BackendChallenge\Outcome\OutcomeInterface;
@@ -256,25 +257,9 @@ class BackendChallengeCommand extends Command {
     // Add global outcomes like "status" and "save".
     foreach ($rooms as $room) {
       $room
-        ->addOutcome('status', new Outcome(
-          'Check my status',
-          sprintf(
-            'You are in room number %d and you have %d hearts left.',
-            $this->character->getProgress() + 1,
-            $this->character->getHealth()
-          ),
-          [],
-        ))
-        ->addOutcome('save', new Outcome(
-          'Save game and exit',
-          '',
-          [new GameSave($this->character)],
-        ))
-        ->addOutcome('exit', new Outcome(
-          'Exit without saving',
-          '',
-          [new GameExit($this->character)],
-        ));
+        ->addOutcome('status', new Outcome('Check my status', '', [new GameStatus($this->character)]))
+        ->addOutcome('save', new Outcome('Save game and exit', '', [new GameSave($this->character)]))
+        ->addOutcome('exit', new Outcome('Exit without saving', '', [new GameExit($this->character)]));
     }
 
     return $rooms;

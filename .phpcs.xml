@@ -11,9 +11,7 @@
   standards with relative paths. Otherwise simply use "Drupal" and
   "DrupalPractice. -->
   <rule ref="vendor/drupal/coder/coder_sniffer/Drupal">
-    <!-- Example how you would disable a rule you are not compliant with yet:
-    <exclude name="Drupal.Commenting.Deprecated"/>
-    -->
+    <exclude name="Drupal.Arrays.Array.LongLineDeclaration"/>
   </rule>
   <rule ref="vendor/drupal/coder/coder_sniffer/DrupalPractice"/>
 

@@ -2,6 +2,7 @@
 
 namespace Root\BackendChallenge\Event\CharacterEvent;
 
+use Root\BackendChallenge\Character\Character;
 use Root\BackendChallenge\Character\CharacterInterface;
 use Root\BackendChallenge\Exceptions\GameOverException;
 use Symfony\Component\Console\Command\Command;
@@ -17,9 +18,12 @@ class CharacterLoseHealthPoint extends BaseCharacterEvent {
    * @throws \Root\BackendChallenge\Exception\GameOverException
    */
   public function resolveEvent(): void {
-    $this->character->loseHealthPoint();
+    // Retreive character instance.
+    $character = Character::getInstance();
 
-    if ($this->character->getHealth() <= CharacterInterface::MINIMUM_HEALTH) {
+    $character->loseHealthPoint();
+
+    if ($character->getHealth() <= CharacterInterface::MINIMUM_HEALTH) {
       throw new GameOverException('You ran out of hearts, you die.', Command::FAILURE);
     }
   }

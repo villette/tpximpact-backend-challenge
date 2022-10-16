@@ -2,6 +2,8 @@
 
 namespace Root\BackendChallenge\Event\CharacterEvent;
 
+use Root\BackendChallenge\Character\Character;
+
 /**
  * Triggers the character to move backwards in the rooms.
  */
@@ -11,7 +13,10 @@ class CharacterMoveBackwards extends BaseCharacterEvent {
    * {@inheritdoc}
    */
   public function resolveEvent(): void {
-    $this->character->moveBackwards();
+    // Retreive character instance.
+    $character = Character::getInstance();
+
+    $character->moveBackwards();
   }
 
 }

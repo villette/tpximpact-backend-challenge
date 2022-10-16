@@ -37,13 +37,6 @@ class BackendChallengeCommand extends Command {
   protected static $defaultDescription = 'Start the Backend Challenge game';
 
   /**
-   * The main character of the game.
-   *
-   * @var \Root\BackendChallenge\Character\CharacterInterface
-   */
-  private $character;
-
-  /**
    * The succession of rooms the character can go through, in order.
    *
    * @var \Root\BackendChallenge\Room\RoomInterface[]
@@ -60,7 +53,11 @@ class BackendChallengeCommand extends Command {
     try {
       // For each room the player goes through, do the following.
       do {
-        $progress = $this->character->getProgress();
+        // Retreive character instance.
+        $character = Character::getInstance();
+
+        // Initialise character progress.
+        $progress = $character->getProgress();
         $room = $this->map[$progress];
 
         // Present the flavour text to the player.
@@ -112,6 +109,9 @@ class BackendChallengeCommand extends Command {
    * {@inheritdoc}
    */
   protected function initialize(InputInterface $input, OutputInterface $output): void {
+    // Initialise game character.
+    $character = Character::getInstance();
+
     /** @var \Symfony\Component\Console\Helper\QuestionHelper $questionHelper */
     $questionHelper = $this->getHelper('question');
 
@@ -129,8 +129,10 @@ class BackendChallengeCommand extends Command {
         $content = file_get_contents(GAME_SAVE_FILE);
         $data = json_decode($content, TRUE);
 
-        // Initialise game character.
-        $this->character = new Character($data['name'] ?? NULL, $data['health'] ?? NULL, $data['progress'] ?? NULL);
+        // Set character data.
+        $character->setName($data['name'] ?? NULL);
+        $character->setHealth($data['health'] ?? NULL);
+        $character->setProgress($data['progress'] ?? NULL);
       }
       else {
         // Ask the player for the character name.
@@ -139,10 +141,10 @@ class BackendChallengeCommand extends Command {
         // Get name answer from player and assign it to character.
         $name = $questionHelper->ask($input, $output, $question);
 
-        // Initialise game character.
-        $this->character = new Character($name);
+        // Set character data.
+        $character->setName($name);
 
-        $output->writeln(sprintf('Your name is %s', $this->character->getName()));
+        $output->writeln(sprintf('Your name is %s', $character->getName()));
       }
 
       $output->writeln('');
@@ -175,12 +177,12 @@ class BackendChallengeCommand extends Command {
           'attack' => new Outcome(
             'Attack the goblin',
             "You parry the goblin's strike, and cleave it in two, but not before it nicks you with a hidden blade. You lose one heart.",
-            [new CharacterLoseHealthPoint($this->character), new CharacterMoveForward($this->character)],
+            [new CharacterLoseHealthPoint(), new CharacterMoveForward()],
           ),
           'run' => new Outcome(
             'Run away',
             'You sprint towards the nearest exit, outpacing the goblin easily.',
-            [new CharacterMoveForward($this->character)],
+            [new CharacterMoveForward()],
           ),
         ],
       ),
@@ -192,12 +194,12 @@ class BackendChallengeCommand extends Command {
           'right_door' => new Outcome(
             'Go through the right hand door',
             'You fall down a 3 meter drop on the other side, slightly injuring your ankle. You climb out of the hole and into an open courtyard. You lose one heart.',
-            [new CharacterLoseHealthPoint($this->character), new CharacterMoveForward($this->character)],
+            [new CharacterLoseHealthPoint(), new CharacterMoveForward()],
           ),
           'left_door' => new Outcome(
             'Go through the left hand door',
             'The door locks behind you and you are in an open courtyard.',
-            [new CharacterMoveForward($this->character)],
+            [new CharacterMoveForward()],
           ),
         ],
       ),
@@ -209,12 +211,12 @@ class BackendChallengeCommand extends Command {
           'enjoy' => new Outcome(
             'Eat, drink and rest',
             'You recover from your injuries and you are ready to move to the next room. You gain one heart.',
-            [new CharacterGainHealthPoint($this->character), new CharacterMoveForward($this->character)],
+            [new CharacterGainHealthPoint(), new CharacterMoveForward()],
           ),
           'ignore' => new Outcome(
             'Ignore the table of refreshments, fearing poison and move on to the next room',
             'Your injuries and fatigue cause you to fall into a bed of hemlock.',
-            [new CharacterDies($this->character), new CharacterMoveForward($this->character)],
+            [new CharacterDies(), new CharacterMoveForward()],
           ),
         ],
       ),
@@ -226,12 +228,12 @@ class BackendChallengeCommand extends Command {
           'accept' => new Outcome(
             'Accept the offer',
             'One beer is never enough and you get horribly drunk, in your haze, you stagger off. You lose one heart.',
-            [new CharacterLoseHealthPoint($this->character), new CharacterMoveForward($this->character)],
+            [new CharacterLoseHealthPoint(), new CharacterMoveForward()],
           ),
           'decline' => new Outcome(
             'Decline and ask for directions to the W.C.',
             'You reach the W.C. and have a wash.',
-            [new CharacterMoveForward($this->character)],
+            [new CharacterMoveForward()],
           ),
         ],
       ),
@@ -243,12 +245,12 @@ class BackendChallengeCommand extends Command {
           'return' => new Outcome(
             'Return the book you borrowed last time you were here and apologise for being late',
             'Your apology is accepted, so you live, but there is no excuse for your tardiness and you are fined 10 Splodges. You lose one heart.',
-            [new CharacterLoseHealthPoint($this->character), new CharacterExitSuccess($this->character)],
+            [new CharacterLoseHealthPoint(), new CharacterExitSuccess()],
           ),
           'borrow' => new Outcome(
             'Borrow the book eagerly recommended by the librarian, as this is your first visit and you wish to impress',
             'You put the book in your bag and walk towards the exit.',
-            [new CharacterExitSuccess($this->character)],
+            [new CharacterExitSuccess()],
           ),
         ],
       ),
@@ -257,9 +259,9 @@ class BackendChallengeCommand extends Command {
     // Add global outcomes like "status" and "save".
     foreach ($rooms as $room) {
       $room
-        ->addOutcome('status', new Outcome('Check my status', '', [new GameStatus($this->character)]))
-        ->addOutcome('save', new Outcome('Save game and exit', '', [new GameSave($this->character)]))
-        ->addOutcome('exit', new Outcome('Exit without saving', '', [new GameExit($this->character)]));
+        ->addOutcome('status', new Outcome('Check my status', '', [new GameStatus()]))
+        ->addOutcome('save', new Outcome('Save game and exit', '', [new GameSave()]))
+        ->addOutcome('exit', new Outcome('Exit without saving', '', [new GameExit()]));
     }
 
     return $rooms;

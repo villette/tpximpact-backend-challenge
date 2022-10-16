@@ -2,6 +2,7 @@
 
 namespace Root\BackendChallenge\Event\GameEvent;
 
+use Root\BackendChallenge\Character\Character;
 use Root\BackendChallenge\Exceptions\GameExitException;
 use Symfony\Component\Console\Command\Command;
 
@@ -16,10 +17,13 @@ class GameSave extends BaseGameEvent {
    * @throws \Root\BackendChallenge\Exception\GameExitException
    */
   public function resolveEvent(): void {
+    // Retreive character instance.
+    $character = Character::getInstance();
+
     $data = [
-      'name' => $this->character->getName(),
-      'health' => $this->character->getHealth(),
-      'progress' => $this->character->getProgress(),
+      'name' => $character->getName(),
+      'health' => $character->getHealth(),
+      'progress' => $character->getProgress(),
     ];
 
     // If an error occurs, do not exit the game.

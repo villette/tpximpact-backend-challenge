@@ -5,7 +5,14 @@ namespace Root\BackendChallenge\Character;
 /**
  * A class describing the character of the game.
  */
-class Character implements CharacterInterface {
+final class Character implements CharacterInterface {
+
+  /**
+   * The unique instance of Character in the application.
+   *
+   * @var static
+   */
+  private static $instance;
 
   /**
    * The name of the character.
@@ -31,10 +38,24 @@ class Character implements CharacterInterface {
   /**
    * Creates a new Character object.
    */
-  public function __construct(string $name = NULL, int $health = NULL, int $progress = NULL) {
+  private function __construct() {
     $this->setName($name ?? self::DEFAULT_NAME);
     $this->setHealth($health ?? self::DEFAULT_HEALTH);
     $this->setProgress($progress ?? self::DEFAULT_PROGRESS);
+  }
+
+  /**
+   * The unique way of retrieving the Character object.
+   *
+   * @return static
+   *   The game's character object.
+   */
+  public static function getInstance(): static {
+    if (empty(self::$instance)) {
+      self::$instance = new static();
+    }
+
+    return self::$instance;
   }
 
   /**

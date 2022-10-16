@@ -2,6 +2,8 @@
 
 namespace Root\BackendChallenge\Event\GameEvent;
 
+use Root\BackendChallenge\Character\Character;
+
 /**
  * Triggers display of game status.
  */
@@ -11,8 +13,11 @@ class GameStatus extends BaseGameEvent {
    * {@inheritdoc}
    */
   public function resolveEvent(): void {
-    $progress = $this->character->getProgress();
-    $hearts = $this->character->getHealth();
+    // Retreive character instance.
+    $character = Character::getInstance();
+
+    $progress = $character->getProgress();
+    $hearts = $character->getHealth();
 
     // This is not great, we should use OutputInterface instead of print.
     print sprintf(

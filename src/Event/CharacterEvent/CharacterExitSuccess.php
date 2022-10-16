@@ -2,6 +2,7 @@
 
 namespace Root\BackendChallenge\Event\CharacterEvent;
 
+use Root\BackendChallenge\Character\Character;
 use Root\BackendChallenge\Exceptions\GameWonException;
 use Symfony\Component\Console\Command\Command;
 
@@ -16,8 +17,11 @@ class CharacterExitSuccess extends BaseCharacterEvent {
    * @throws \Root\BackendChallenge\Exception\GameWonException
    */
   public function resolveEvent(): void {
-    $name = $this->character->getName();
-    $hearts = $this->character->getHealth();
+    // Retreive character instance.
+    $character = Character::getInstance();
+
+    $name = $character->getName();
+    $hearts = $character->getHealth();
 
     $message = sprintf(
       'Congratulation %s! You successfully exited the dungeon with %s.',

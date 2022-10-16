@@ -3,10 +3,13 @@
 namespace Root\BackendChallenge;
 
 use Root\BackendChallenge\Character\Character;
-use Root\BackendChallenge\Event\CharacterDies;
-use Root\BackendChallenge\Event\CharacterExitSuccess;
-use Root\BackendChallenge\Event\CharacterGainHealthPoint;
-use Root\BackendChallenge\Event\CharacterLoseHealthPoint;
+use Root\BackendChallenge\Event\CharacterEvent\CharacterDies;
+use Root\BackendChallenge\Event\CharacterEvent\CharacterExitSuccess;
+use Root\BackendChallenge\Event\CharacterEvent\CharacterGainHealthPoint;
+use Root\BackendChallenge\Event\CharacterEvent\CharacterLoseHealthPoint;
+use Root\BackendChallenge\Event\CharacterEvent\CharacterMoveForward;
+use Root\BackendChallenge\Event\GameEvent\GameExit;
+use Root\BackendChallenge\Event\GameEvent\GameSave;
 use Root\BackendChallenge\Exceptions\BackendChallengeException;
 use Root\BackendChallenge\Outcome\Outcome;
 use Root\BackendChallenge\Outcome\OutcomeInterface;
@@ -53,19 +56,12 @@ class BackendChallengeCommand extends Command {
     /** @var \Symfony\Component\Console\Helper\QuestionHelper $questionHelper */
     $questionHelper = $this->getHelper('question');
 
-    // Ask the player for the character name.
-    $question = new Question("What is your name?\n", 'Maximilian');
-
-    // Get name answer from player and assign it to character.
-    $name = $questionHelper->ask($input, $output, $question);
-    $this->character->setName($name);
-
-    $output->writeln(sprintf('Your name is %s', $name));
-    $output->writeln('');
-
     try {
       // For each room the player goes through, do the following.
-      foreach ($this->map as $room) {
+      do {
+        $progress = $this->character->getProgress();
+        $room = $this->map[$progress];
+
         // Present the flavour text to the player.
         $output->writeln($room->introduction());
 
@@ -96,7 +92,7 @@ class BackendChallengeCommand extends Command {
         }
 
         $output->writeln('');
-      }
+      } while ($progress < count($this->map));
     }
     catch (BackendChallengeException $e) {
       // In case of a win or a loss, there is a BackendChallengeException thrown
@@ -115,7 +111,43 @@ class BackendChallengeCommand extends Command {
    * {@inheritdoc}
    */
   protected function initialize(InputInterface $input, OutputInterface $output): void {
-    $this->character = new Character();
+    /** @var \Symfony\Component\Console\Helper\QuestionHelper $questionHelper */
+    $questionHelper = $this->getHelper('question');
+
+    // Ask the player if they want to load game if a save game exists.
+    if (file_exists(GAME_SAVE_FILE)) {
+      $question = new ChoiceQuestion(
+        'A saved game exists, do you want to load it or start a new one?',
+        [
+          'load' => 'Load existing game save',
+          'new' => 'Start new game',
+        ],
+      );
+
+      if ($questionHelper->ask($input, $output, $question) == 'load') {
+        $content = file_get_contents(GAME_SAVE_FILE);
+        $data = json_decode($content, TRUE);
+
+        // Initialise game character.
+        $this->character = new Character($data['name'] ?? NULL, $data['health'] ?? NULL, $data['progress'] ?? NULL);
+      }
+      else {
+        // Ask the player for the character name.
+        $question = new Question("What is your name?\n");
+
+        // Get name answer from player and assign it to character.
+        $name = $questionHelper->ask($input, $output, $question);
+
+        // Initialise game character.
+        $this->character = new Character($name);
+
+        $output->writeln(sprintf('Your name is %s', $this->character->getName()));
+      }
+
+      $output->writeln('');
+    }
+
+    // Initialise game rooms.
     $this->map = $this->prepareRooms();
   }
 
@@ -134,7 +166,7 @@ class BackendChallengeCommand extends Command {
    * @see \Root\BackendChallenge\Event\EventInterface
    */
   private function prepareRooms(): array {
-    return [
+    $rooms = [
       new Room(
         'You are in a dungeon. A goblin stares at you menacingly.',
         'The goblin charges toward you, blade drawn. Do you:',
@@ -142,12 +174,12 @@ class BackendChallengeCommand extends Command {
           'attack' => new Outcome(
             'Attack the goblin',
             "You parry the goblin's strike, and cleave it in two, but not before it nicks you with a hidden blade. You lose one heart.",
-            [new CharacterLoseHealthPoint($this->character)],
+            [new CharacterLoseHealthPoint($this->character), new CharacterMoveForward($this->character)],
           ),
           'run' => new Outcome(
             'Run away',
             'You sprint towards the nearest exit, outpacing the goblin easily.',
-            [],
+            [new CharacterMoveForward($this->character)],
           ),
         ],
       ),
@@ -159,12 +191,12 @@ class BackendChallengeCommand extends Command {
           'right_door' => new Outcome(
             'Go through the right hand door',
             'You fall down a 3 meter drop on the other side, slightly injuring your ankle. You climb out of the hole and into an open courtyard. You lose one heart.',
-            [new CharacterLoseHealthPoint($this->character)],
+            [new CharacterLoseHealthPoint($this->character), new CharacterMoveForward($this->character)],
           ),
           'left_door' => new Outcome(
             'Go through the left hand door',
             'The door locks behind you and you are in an open courtyard.',
-            [],
+            [new CharacterMoveForward($this->character)],
           ),
         ],
       ),
@@ -176,12 +208,12 @@ class BackendChallengeCommand extends Command {
           'enjoy' => new Outcome(
             'Eat, drink and rest',
             'You recover from your injuries and you are ready to move to the next room. You gain one heart.',
-            [new CharacterGainHealthPoint($this->character)],
+            [new CharacterGainHealthPoint($this->character), new CharacterMoveForward($this->character)],
           ),
           'ignore' => new Outcome(
             'Ignore the table of refreshments, fearing poison and move on to the next room',
             'Your injuries and fatigue cause you to fall into a bed of hemlock.',
-            [new CharacterDies($this->character)],
+            [new CharacterDies($this->character), new CharacterMoveForward($this->character)],
           ),
         ],
       ),
@@ -193,12 +225,12 @@ class BackendChallengeCommand extends Command {
           'accept' => new Outcome(
             'Accept the offer',
             'One beer is never enough and you get horribly drunk, in your haze, you stagger off. You lose one heart.',
-            [new CharacterLoseHealthPoint($this->character)],
+            [new CharacterLoseHealthPoint($this->character), new CharacterMoveForward($this->character)],
           ),
           'decline' => new Outcome(
             'Decline and ask for directions to the W.C.',
             'You reach the W.C. and have a wash.',
-            [],
+            [new CharacterMoveForward($this->character)],
           ),
         ],
       ),
@@ -210,10 +242,7 @@ class BackendChallengeCommand extends Command {
           'return' => new Outcome(
             'Return the book you borrowed last time you were here and apologise for being late',
             'Your apology is accepted, so you live, but there is no excuse for your tardiness and you are fined 10 Splodges. You lose one heart.',
-            [
-              new CharacterLoseHealthPoint($this->character),
-              new CharacterExitSuccess($this->character),
-            ],
+            [new CharacterLoseHealthPoint($this->character), new CharacterExitSuccess($this->character)],
           ),
           'borrow' => new Outcome(
             'Borrow the book eagerly recommended by the librarian, as this is your first visit and you wish to impress',
@@ -223,6 +252,32 @@ class BackendChallengeCommand extends Command {
         ],
       ),
     ];
+
+    // Add global outcomes like "status" and "save".
+    foreach ($rooms as $room) {
+      $room
+        ->addOutcome('status', new Outcome(
+          'Check my status',
+          sprintf(
+            'You are in room number %d and you have %d hearts left.',
+            $this->character->getProgress() + 1,
+            $this->character->getHealth()
+          ),
+          [],
+        ))
+        ->addOutcome('save', new Outcome(
+          'Save game and exit',
+          '',
+          [new GameSave($this->character)],
+        ))
+        ->addOutcome('exit', new Outcome(
+          'Exit without saving',
+          '',
+          [new GameExit($this->character)],
+        ));
+    }
+
+    return $rooms;
   }
 
 }

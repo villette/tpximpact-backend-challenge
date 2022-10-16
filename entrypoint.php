@@ -10,8 +10,15 @@ require __DIR__ . '/vendor/autoload.php';
 use Root\BackendChallenge\BackendChallengeCommand;
 use Symfony\Component\Console\Application;
 
+// Define useful constants.
+const PROJECT_ROOT = __DIR__;
+const GAME_SAVE_FILE = PROJECT_ROOT . DIRECTORY_SEPARATOR . 'game.sav';
+
+// Bootstrap application.
 $application = new Application();
 
+// Add main game command.
 $application->add(new BackendChallengeCommand());
 
+// Run application.
 $application->run();

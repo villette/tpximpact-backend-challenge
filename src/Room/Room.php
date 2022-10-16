@@ -2,6 +2,8 @@
 
 namespace Root\BackendChallenge\Room;
 
+use Root\BackendChallenge\Outcome\OutcomeInterface;
+
 /**
  * An class describing a room of the game.
  */
@@ -63,6 +65,23 @@ class Room implements RoomInterface {
    */
   public function outcomes(): array {
     return $this->outcomes;
+  }
+
+  /**
+   * Add an outcome to the list.
+   *
+   * @param string $name
+   *   The name of the outcome.
+   * @param \Root\BackendChallenge\Outcome\OutcomeInterface $outcome
+   *   The outcome to add.
+   *
+   * @return static
+   *   The current Room object.
+   */
+  public function addOutcome(string $name, OutcomeInterface $outcome): static {
+    $this->outcomes[$name] = $outcome;
+
+    return $this;
   }
 
 }

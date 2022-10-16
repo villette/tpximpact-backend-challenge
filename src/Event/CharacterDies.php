@@ -1,6 +1,6 @@
 <?php
 
-namespace Root\BackendChallenge\Event\CharacterEvent;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Exceptions\GameOverException;
 use Symfony\Component\Console\Command\Command;
@@ -8,7 +8,7 @@ use Symfony\Component\Console\Command\Command;
 /**
  * Triggers game over from death of character.
  */
-class CharacterDies extends BaseCharacterEvent {
+class CharacterDies implements EventInterface {
 
   /**
    * {@inheritdoc}

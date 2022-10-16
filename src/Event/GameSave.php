@@ -1,6 +1,6 @@
 <?php
 
-namespace Root\BackendChallenge\Event\GameEvent;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Character\Character;
 use Root\BackendChallenge\Exceptions\GameExitException;
@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 /**
  * Triggers game save and exit.
  */
-class GameSave extends BaseGameEvent {
+class GameSave implements EventInterface{
 
   /**
    * {@inheritdoc}

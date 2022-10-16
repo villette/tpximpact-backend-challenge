@@ -1,6 +1,6 @@
 <?php
 
-namespace Root\BackendChallenge\Event\GameEvent;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Exceptions\GameExitException;
 use Symfony\Component\Console\Command\Command;
@@ -8,7 +8,7 @@ use Symfony\Component\Console\Command\Command;
 /**
  * Triggers game exit.
  */
-class GameExit extends BaseGameEvent {
+class GameExit implements EventInterface{
 
   /**
    * {@inheritdoc}

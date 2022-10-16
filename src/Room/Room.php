@@ -40,7 +40,7 @@ class Room implements RoomInterface {
    * @param \Root\BackendChallenge\Outcome\OutcomeInterface[] $outcomes
    *   The different outcomes of the room.
    */
-  public function __construct(string $introduction, string $question, array $outcomes) {
+  public function __construct(string $introduction, string $question, array $outcomes = []) {
     $this->introduction = $introduction;
     $this->question = $question;
     $this->outcomes = $outcomes;

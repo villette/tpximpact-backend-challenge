@@ -1,6 +1,6 @@
 <?php
 
-namespace Root\BackendChallenge\Event\CharacterEvent;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Character\Character;
 use Root\BackendChallenge\Exceptions\GameWonException;
@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 /**
  * Triggers game over from exiting dungeon successfully.
  */
-class CharacterExitSuccess extends BaseCharacterEvent {
+class CharacterExitSuccess implements EventInterface {
 
   /**
    * {@inheritdoc}

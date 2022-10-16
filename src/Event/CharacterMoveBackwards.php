@@ -1,13 +1,13 @@
 <?php
 
-namespace Root\BackendChallenge\Event\CharacterEvent;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Character\Character;
 
 /**
  * Triggers the character to move backwards in the rooms.
  */
-class CharacterMoveBackwards extends BaseCharacterEvent {
+class CharacterMoveBackwards implements EventInterface {
 
   /**
    * {@inheritdoc}

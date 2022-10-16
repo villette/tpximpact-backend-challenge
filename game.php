@@ -12,8 +12,8 @@ use Root\BackendChallenge\BackendChallengeCommand;
 use Symfony\Component\Console\Application;
 
 // Define useful constants.
-const PROJECT_ROOT = __DIR__;
-const GAME_SAVE_FILE = PROJECT_ROOT . DIRECTORY_SEPARATOR . 'game.sav';
+const GAME_SAVE_FILE = __DIR__ . DIRECTORY_SEPARATOR . 'game.sav';
+const DATA_FILE = __DIR__ . DIRECTORY_SEPARATOR . 'data.yml';
 
 // Bootstrap application.
 $application = new Application();

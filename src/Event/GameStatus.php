@@ -1,13 +1,13 @@
 <?php
 
-namespace Root\BackendChallenge\Event\GameEvent;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Character\Character;
 
 /**
  * Triggers display of game status.
  */
-class GameStatus extends BaseGameEvent {
+class GameStatus implements EventInterface{
 
   /**
    * {@inheritdoc}

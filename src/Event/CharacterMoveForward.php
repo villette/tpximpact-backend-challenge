@@ -1,13 +1,13 @@
 <?php
 
-namespace Root\BackendChallenge\Event\CharacterEvent;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Character\Character;
 
 /**
- * Triggers the gain of one point for the character.
+ * Triggers the character to move forward in the rooms.
  */
-class CharacterGainHealthPoint extends BaseCharacterEvent {
+class CharacterMoveForward implements EventInterface {
 
   /**
    * {@inheritdoc}
@@ -16,7 +16,7 @@ class CharacterGainHealthPoint extends BaseCharacterEvent {
     // Retreive character instance.
     $character = Character::getInstance();
 
-    $character->gainHealthPoint();
+    $character->moveForward();
   }
 
 }

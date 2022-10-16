@@ -1,0 +1,76 @@
+rooms:
+  -
+    introduction: You are in a dungeon. A goblin stares at you menacingly.
+    question: "The goblin charges toward you, blade drawn. Do you:"
+    outcomes:
+      attack:
+        choice: Attack the goblin
+        result: You parry the goblin's strike, and cleave it in two, but not before it nicks you with a hidden blade. You lose one heart.
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterLoseHealthPoint
+          - \Root\BackendChallenge\Event\CharacterMoveForward
+      run:
+        choice: Run away
+        result: You sprint towards the nearest exit, outpacing the goblin easily.
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterMoveForward
+  -
+    introduction: You pass through the exit and run down a corridor…
+    question: "At the end of the corridor, you find two doors and must pass through one of them. Do you:"
+    outcomes:
+      right_door:
+        choice: Go through the right hand door
+        result: You fall down a 3 meter drop on the other side, slightly injuring your ankle. You climb out of the hole and into an open courtyard. You lose one heart.
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterLoseHealthPoint
+          - \Root\BackendChallenge\Event\CharacterMoveForward
+      left_door:
+        choice: Go through the left hand door
+        result: The door locks behind you and you are in an open courtyard.
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterMoveForward
+  -
+    introduction: You see a table with food and drink.
+    question: "You are tired, hungry and thirsty. Do you:"
+    outcomes:
+      enjoy:
+        choice: Eat, drink and rest
+        result: You recover from your injuries and you are ready to move to the next room. You gain one heart.
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterGainHealthPoint
+          - \Root\BackendChallenge\Event\CharacterMoveForward
+      ignore:
+        choice: Ignore the table of refreshments, fearing poison and move on to the next room
+        result: Your injuries and fatigue cause you to fall into a bed of hemlock.
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterDies
+  -
+    introduction: You are now in a beer cellar. You are tempted to try the merchandise.
+    question: 'The barkeep offers you a beer. Do you:'
+    outcomes:
+      accept:
+        choice: Accept the offer
+        result: One beer is never enough and you get horribly drunk, in your haze, you stagger off. You lose one heart.
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterLoseHealthPoint
+          - \Root\BackendChallenge\Event\CharacterMoveForward
+      decline:
+        choice: Decline and ask for directions to the W.C.
+        result: You reach the W.C. and have a wash.
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterMoveForward
+  -
+    introduction: 'You reach a library. You see the librarian, who is an orangutan, hanging around the desk.'
+    question: "The librarian says 'OOOK?' Do you:"
+    outcomes:
+      return:
+        choice: Return the book you borrowed last time you were here and apologise for being late,
+        result: Your apology is accepted, so you live, but there is no excuse for your tardiness and you are fined 10 Splodges. You lose one heart.,
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterLoseHealthPoint
+          - \Root\BackendChallenge\Event\CharacterExitSuccess
+      borrow:
+        choice: Borrow the book eagerly recommended by the librarian, as this is your first visit and you wish to impress,
+        result: You put the book in your bag and walk towards the exit.,
+        consequences:
+          - \Root\BackendChallenge\Event\CharacterExitSuccess

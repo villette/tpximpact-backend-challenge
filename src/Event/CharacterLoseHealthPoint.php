@@ -1,6 +1,6 @@
 <?php
 
-namespace Root\BackendChallenge\Event\CharacterEvent;
+namespace Root\BackendChallenge\Event;
 
 use Root\BackendChallenge\Character\Character;
 use Root\BackendChallenge\Character\CharacterInterface;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Command\Command;
 /**
  * Triggers the loss of one point for the character.
  */
-class CharacterLoseHealthPoint extends BaseCharacterEvent {
+class CharacterLoseHealthPoint implements EventInterface {
 
   /**
    * {@inheritdoc}
